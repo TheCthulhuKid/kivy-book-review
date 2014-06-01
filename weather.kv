@@ -1,3 +1,6 @@
+#: import main main
+#: import ListAdapter kivy.adapters.listadapter.ListAdapter
+
 WeatherRoot:
 
 <WeatherRoot>:
@@ -13,6 +16,7 @@ WeatherRoot:
         TextInput:
             size_hint_x: 50
             id: search_box
+            focus: True
             multiline: False
             on_text_validate: root.search_location()
         Button:
@@ -24,4 +28,34 @@ WeatherRoot:
             size_hint_x: 25
     ListView:
         id: search_results_list
-        item_strings: []
+        adapter:
+            ListAdapter(data=[], cls=main.LocationButton)
+    Button:
+        text: "Cancel"
+        size_hint_y: None
+        height: "40dp"
+        on_press: app.root.show_current_weather(None)
+
+
+<CurrentWeather@BoxLayout>:
+    location: ""
+    conditions: None
+    temp: None
+    temp_min: None
+    temp_max: None
+    orientation: "vertical"
+    Label:
+        text: root.location
+    BoxLayout:
+        orientation: "horizontal"
+        size_hint_y: None
+        height: "40dp"
+        Button:
+            text: "Add Location"
+            on_press: app.root.show_add_location_form()
+        Button:
+            text: "Forecast"
+
+
+<LocationButton>:
+    on_press: app.root.show_current_weather(self.text)
