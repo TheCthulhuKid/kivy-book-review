@@ -3,7 +3,7 @@ from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.listview import ListItemButton
 
-from kivy.properties import ObjectProperty
+from kivy.properties import ObjectProperty, ListProperty, StringProperty, NumericProperty
 from kivy.network.urlrequest import UrlRequest
 
 from kivy.factory import Factory
@@ -11,8 +11,13 @@ from kivy.factory import Factory
 import json
 
 
+def locations_args_converter(index, data_item):
+    city, country = data_item
+    return {'location': (city, country)}
+
+
 class LocationButton(ListItemButton):
-    pass
+    location = ListProperty()
 
 
 class WeatherRoot(BoxLayout):
@@ -26,13 +31,21 @@ class WeatherRoot(BoxLayout):
         self.clear_widgets()
 
         if location is None and self.current_weather is None:
-            location = "Vienna (AT)"
+            location = ("Vienna", "AT")
 
         if location is not None:
             self.current_weather = Factory.CurrentWeather()
             self.current_weather.location = location
 
         self.add_widget(self.current_weather)
+
+
+class CurrentWeather(BoxLayout):
+    location = ListProperty(['Vienna', 'AT'])
+    conditions = StringProperty()
+    temp = NumericProperty()
+    temp_min = NumericProperty()
+    temp_max = NumericProperty()
 
 
 class AddLocationForm(BoxLayout):
@@ -50,8 +63,7 @@ class AddLocationForm(BoxLayout):
 
     def found_location(self, request, data):
         data = json.loads(data.decode()) if not isinstance(data, dict) else data
-        cities = ["{} ({})".format(d['name'], d['sys']['country'])
-                  for d in data['list']]
+        cities = [(d['name'], d['sys']['country']) for d in data['list']]
         self.search_results.item_strings = cities
         self.search_results.adapter.data.clear()
         self.search_results.adapter.data.extend(cities)

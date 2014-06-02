@@ -29,7 +29,7 @@ WeatherRoot:
     ListView:
         id: search_results_list
         adapter:
-            ListAdapter(data=[], cls=main.LocationButton)
+            ListAdapter(data=[], cls=main.LocationButton, args_converter=main.locations_args_converter)
     Button:
         text: "Cancel"
         size_hint_y: None
@@ -38,14 +38,14 @@ WeatherRoot:
 
 
 <CurrentWeather@BoxLayout>:
-    location: ""
+    location: ['Vienna', 'AT']
     conditions: None
     temp: None
     temp_min: None
     temp_max: None
     orientation: "vertical"
     Label:
-        text: root.location
+        text: "{} ({})".format(root.location[0], root.location[1])
     BoxLayout:
         orientation: "horizontal"
         size_hint_y: None
@@ -58,4 +58,7 @@ WeatherRoot:
 
 
 <LocationButton>:
-    on_press: app.root.show_current_weather(self.text)
+    text: "{} ({})".format(self.location[0], self.location[1])
+    height: "40dp"
+    size_hint_y: None
+    on_press: app.root.show_current_weather(self.location)
