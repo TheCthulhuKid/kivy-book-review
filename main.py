@@ -10,6 +10,8 @@ from kivy.factory import Factory
 
 import json
 
+api_url = "http://api.openweather.org/data/2.5"
+
 
 def locations_args_converter(index, data_item):
     city, country = data_item
@@ -30,13 +32,13 @@ class WeatherRoot(BoxLayout):
     def show_current_weather(self, location=None):
         self.clear_widgets()
 
-        if location is None and self.current_weather is None:
-            location = ("Vienna", "AT")
+        if self.current_weather is None:
+            self.current_weather = CurrentWeather()
 
         if location is not None:
-            self.current_weather = Factory.CurrentWeather()
             self.current_weather.location = location
 
+        self.current_weather.update_weather()
         self.add_widget(self.current_weather)
 
 
@@ -46,6 +48,18 @@ class CurrentWeather(BoxLayout):
     temp = NumericProperty()
     temp_min = NumericProperty()
     temp_max = NumericProperty()
+
+    def update_weather(self):
+        weather_template = api_url + "weather?q={},{}&units=metric"
+        weather_url = weather_template.format(*self.location)
+        request = UrlRequest(weather_url, self.weather_retrieved)
+
+    def weather_retrieved(self, request, data):
+        data = json.loads(data.decode()) if not isinstance(data, dict) else data
+        self.conditions = data['weather'][0]['description']
+        self.temp = data['main']['temp']
+        self.temp_min = data['main']['temp_min']
+        self.temp_max = data['main']['temp_max']
 
 
 class AddLocationForm(BoxLayout):
@@ -57,7 +71,7 @@ class AddLocationForm(BoxLayout):
         if len(self.search_input.text) == 0:
             self.search_results.item_strings = ["You did not enter a location"]
             return
-        search_template = "http://api.openweathermap.org/data/2.5/find?q={}&type=like"
+        search_template = api_url + "find?q={}&type=like"
         search_url = search_template.format(self.search_input.text)
         request = UrlRequest(search_url, self.found_location)
 

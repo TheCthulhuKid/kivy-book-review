@@ -37,12 +37,7 @@ WeatherRoot:
         on_press: app.root.show_current_weather(None)
 
 
-<CurrentWeather@BoxLayout>:
-    location: ['Vienna', 'AT']
-    conditions: None
-    temp: None
-    temp_min: None
-    temp_max: None
+<CurrentWeather>:
     orientation: "vertical"
     Label:
         text: "{} ({})".format(root.location[0], root.location[1])
