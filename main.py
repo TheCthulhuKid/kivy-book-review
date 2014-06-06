@@ -10,7 +10,7 @@ from kivy.factory import Factory
 
 import json
 
-api_url = "http://api.openweather.org/data/2.5"
+api_url = "http://api.openweathermap.org/data/2.5/"
 
 
 def locations_args_converter(index, data_item):
